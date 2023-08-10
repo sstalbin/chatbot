@@ -1,4 +1,5 @@
 # PREPROCESS TRAINING DATASET 
+import numpy 
 import nltk
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
@@ -78,3 +79,27 @@ model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=
 # Train model
 num_epochs = 50
 history = model.fit(training_data, training_labels, epochs=num_epochs, verbose=2)
+
+# BUILD SIMPLE COMMAND LINE INTERFACE 
+
+# Function that predicts answer 
+def predict_answer(model, tokenizer, question):
+    # Preprocess question
+    question = preprocess(question)
+    # Convert question to sequence
+    sequence = tokenizer.texts_to_sequences([question])
+    # Pad sequence
+    padded_sequence = pad_sequences(sequence, maxlen=max_length, padding=padding_type, truncating=trunc_type)
+    # Predict answer
+    pred = model.predict(padded_sequence)[0]
+    # Get index of highest probability
+    idx = numpy.argmax(pred)
+    # Get answer
+    answer = tokenizer.index_word[idx]
+    return answer
+
+# Start chatbot
+while True:
+    question = input('You: ')
+    answer = predict_answer(model, tokenizer, question)
+    print('SithBot:', answer)
